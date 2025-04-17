@@ -44,7 +44,7 @@ class UniformCostSearch:
             
             for action,state in successors.items():
                 print("recorrido de actions")
-                new_cost = node.cost + grid.get_cost(node.state) 
+                new_cost = node.cost + grid.get_cost(state) 
                 new_node =  Node("", state, new_cost, parent=node, action=action)
 
                 if state not in explored or new_cost < explored[new_node.state]:
@@ -53,6 +53,6 @@ class UniformCostSearch:
                         # running = False
                         return Solution(new_node, explored)
 
-                    explored[state] = new_node.cost
+                    explored[state] = new_cost
                     frontier.add(new_node)
 
