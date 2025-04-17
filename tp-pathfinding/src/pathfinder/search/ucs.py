@@ -1,5 +1,5 @@
 from ..models.grid import Grid
-from ..models.frontier import StackFrontier
+from ..models.frontier import PriorityQueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 
@@ -19,9 +19,9 @@ class UniformCostSearch:
         # Initialize a node with the initial position
         node = Node("", grid.start,0,None,0)
 
-        frontier = StackFrontier()
+        frontier = PriorityQueueFrontier()
 
-        frontier.add(node)
+        frontier.add(node,node.cost)
 
         # Add the node to the explored dictionary
         explored = {node.state: node.cost}
@@ -35,7 +35,7 @@ class UniformCostSearch:
                 return NoSolution(explored)
 
             #Remover nodo de la frontera
-            node = frontier.remove()
+            node = frontier.pop()
             
             if node.state == grid.end:
                 return Solution(node, explored)
@@ -45,14 +45,10 @@ class UniformCostSearch:
             for action,state in successors.items():
                 print("recorrido de actions")
                 new_cost = node.cost + grid.get_cost(state) 
-                new_node =  Node("", state, new_cost, parent=node, action=action)
+                
 
                 if state not in explored or new_cost < explored[new_node.state]:
-                    
-                    if new_node.state == grid.end:
-                        # running = False
-                        return Solution(new_node, explored)
-
+                    new_node =  Node("", state, new_cost, parent=node, action=action)
                     explored[state] = new_cost
-                    frontier.add(new_node)
+                    frontier.add(new_node,new_node.cost)
 
