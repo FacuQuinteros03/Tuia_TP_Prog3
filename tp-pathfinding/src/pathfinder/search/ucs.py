@@ -21,7 +21,7 @@ class UniformCostSearch:
 
         frontier = StackFrontier()
 
-        frontier.add(node, node.cost)
+        frontier.add(node)
 
         # Add the node to the explored dictionary
         explored = {node.state: node.cost}
@@ -37,23 +37,22 @@ class UniformCostSearch:
             #Remover nodo de la frontera
             node = frontier.remove()
             
-            if grid.end(node.state):
+            if node.state == grid.end:
                 return Solution(node, explored)
 
             successors = grid.get_neighbours(node.state)
             
             for action,state in successors.items():
                 print("recorrido de actions")
-                new_cost = node.cost + grid.get_cost(node.state,action) 
-                
+                new_cost = node.cost + grid.get_cost(node.state) 
+                new_node =  Node("", state, new_cost, parent=node, action=action)
 
-                if state not in explored or new_cost < explored [new_node]:
-                    new_node =  Node("", state, new_cost, parent=node, action=action)
-
+                if state not in explored or new_cost < explored[new_node.state]:
+                    
                     if new_node.state == grid.end:
                         # running = False
                         return Solution(new_node, explored)
 
-                    explored[state] = True
+                    explored[state] = new_node.cost
                     frontier.add(new_node)
 
