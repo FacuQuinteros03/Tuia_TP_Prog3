@@ -3,12 +3,6 @@ from ..models.frontier import PriorityQueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 
-def h(state:tuple[int,int],target_state:tuple[int,int]) -> int: 
-    "Return heuristic value from a node to a target state." 
-    x1,y1 = state
-    x2,y2 = target_state
-    return abs(x1 - x2) + abs(y1 - y2)
-
 class GreedyBestFirstSearch:
     @staticmethod
     def search(grid: Grid) -> Solution:
@@ -26,7 +20,7 @@ class GreedyBestFirstSearch:
 
         frontier = PriorityQueueFrontier()
 
-        frontier.add(node,h(node.state,grid.end))
+        frontier.add(node,grid.manhattan_h(node.state))
 
         # Add the node to the explored dictionary
         explored = {node.state: node.cost}
@@ -52,9 +46,9 @@ class GreedyBestFirstSearch:
                 new_cost = node.cost + grid.get_cost(state) 
                 
 
-                if state not in explored or new_cost < explored[new_node.state]:
+                if state not in explored or new_cost < explored[state]:
                     new_node =  Node("", state, new_cost, parent=node, action=action)
                     explored[state] = new_cost
-                    frontier.add(new_node,h(new_node.state,grid.end))
+                    frontier.add(new_node,grid.manhattan_h(new_node.state))
 
 

@@ -15,7 +15,14 @@ class Grid:
         # Calculate grid dimensions
         self.width = max(len(row) for row in grid)
         self.height = len(grid)
-
+    def manhattan_h(self, state: tuple[int, int], target_state: tuple[int, int] = None) -> int:
+        """Retun the heuristic value from a state to a target 
+        state using the Manhattan distance."""
+        if target_state is None:
+            target_state = self.end
+        x1, y1 = state
+        x2, y2 = target_state
+        return abs(x1 - x2) + abs(y1 - y2)
     def get_node(self, pos: tuple[int, int]) -> Node:
         """Get node by position
 

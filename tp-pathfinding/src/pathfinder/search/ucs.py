@@ -47,7 +47,7 @@ class UniformCostSearch:
                 new_cost = node.cost + grid.get_cost(state) 
                 
 
-                if state not in explored or new_cost < explored[new_node.state]:
+                if state not in explored or new_cost < explored[state]:
                     new_node =  Node("", state, new_cost, parent=node, action=action)
                     explored[state] = new_cost
                     frontier.add(new_node,new_node.cost)
