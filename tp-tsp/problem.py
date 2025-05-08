@@ -64,12 +64,14 @@ class OptProblem:
         """Determina el valor objetivo de un estado."""
         raise NotImplementedError
 
-    def max_action(self, state: State) -> tuple[Action, float]:
+    def max_action(self, state: State, tabu:list[State]=[]) -> tuple[Action, float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
 
         La idea es que este metodo este optimizado y sea mas eficiente que generar cada
         estado sucesor por separado y calcular su valor objetivo con self.obj_val().
         """
+
+
         raise NotImplementedError
 
     def random_reset(self) -> State:
@@ -161,7 +163,8 @@ class TSP(OptProblem):
             value -= self.G.get_edge_data(u, v)['weight']
         return value
 
-    def max_action(self, state: list[int]) -> tuple[tuple[int, int], float]:
+    #si usamos acciones lista de tuplas de entero,entero
+    def max_action(self, state: list[int], tabu:list[tuple[int,int]] = []) -> tuple[tuple[int, int], float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
         
         Se encuentra optimizada y por razones de eficiencia no se generan los sucesores y 
@@ -179,10 +182,14 @@ class TSP(OptProblem):
         max_val: float
             valor objetivo del sucesor que resulta de aplicar min_act
         """
+
+
         value = self.obj_val(state)
         max_act = None
         max_val = float("-inf")
         for a in self.actions(state):
+            if a in tabu:
+                continue
             i, j = a
             v1 = state[i]+1  # origen de i
             v2 = state[i+1]+1  # destino de i

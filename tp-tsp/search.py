@@ -17,7 +17,8 @@ No viene implementado, se debe completar.
 
 from __future__ import annotations
 from time import time
-from problem import OptProblem
+from problem import OptProblem, TSP
+
 
 
 class LocalSearch:
@@ -80,12 +81,114 @@ class HillClimbing(LocalSearch):
 
 
 class HillClimbingReset(LocalSearch):
+
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
 
+
+    """Clase que representa un algoritmo de ascension de colinas.
+
+    En cada iteracion se mueve al estado sucesor con mejor valor objetivo.
+    El criterio de parada es alcanzar un optimo local.
+    """
+
+    def solve(self, problem: TSP, max_restarts=10):
+        """Resuelve un problema de optimizacion con ascension de colinas.
+
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimizacion
+        """
+        # Inicializamos reinicios y la cantidad que queremos
+        restarts = 0
+        best_value = -float("inf") 
+        best_solution = None
+        # Inicio del reloj
+        start = time()
+
+        while restarts <= max_restarts:
+            if restarts == 0:
+                actual_state = problem.init
+            else:
+                actual_state = problem.random_reset()
+
+        # Arrancamos del estado inicial
+        
+            value = problem.obj_val(actual_state)
+
+            while True:
+
+                # Buscamos la acción que genera el sucesor con mayor valor objetivo
+                act, succ_val = problem.max_action(actual_state)
+
+                # Retornar si estamos en un maximo local:
+                # el valor objetivo del sucesor es menor o igual al del estado actual
+
+
+                if succ_val <= value:
+                    break
+
+                # Sino, nos movemos al sucesor
+                actual_state = problem.result(actual_state, act)
+                value = succ_val
+                self.niters += 1
+
+            if value > best_value:
+                best_value = value
+                best_solution = actual_state
+            
+            restarts += 1
+        
+
+        end = time()
+        self.value = best_value
+        self.tour = best_solution
+        self.time = end-start
     # COMPLETAR
 
 
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
+    def solve(self, problem: TSP, max_stops = 10):
+        stops = 0
+        actual_state = problem.init
+        best_state = actual_state
+        best_value = problem.obj_val(actual_state)
+        tabu = []
+        tabu_len = 7
+        start = time()
+
+
+        while stops <= max_stops:
+
+            act, succ_val = problem.max_action(actual_state,tabu)
+
+            # Moverse al sucesor
+            next_state = problem.result(actual_state, act)
+
+            # Registrar iteración
+            self.niters += 1
+
+            # Ver si encontramos una mejor solución global
+            if succ_val > best_value:
+                best_value = succ_val
+                best_state = next_state
+                stops = 0  # reseteamos porque mejoramos
+            else:
+                stops += 1  # no mejoramos, contamos estancamiento
+
+            # Agregamos acción a la lista tabú
+            tabu.append(act)
+            print(tabu)
+            if len(tabu) > tabu_len:
+                tabu.pop(0)
+                
+            actual_state = next_state  # avanzamos
+
+        end = time()
+        self.tour = best_state
+        self.value = best_value
+        self.time = end - start
+              
 
     # COMPLETAR
