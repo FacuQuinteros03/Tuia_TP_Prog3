@@ -120,16 +120,10 @@ class HillClimbingReset(LocalSearch):
         
         n = problem.G.number_of_nodes()
         
-        if not hasattr(problem, 'init'):
-            # Si no tiene init, usamos el número de nodos directamente
-            state_space_size = math.factorial(n - 1)
-        else:
-            # Si tiene init, verificamos su longitud
-            if len(problem.init) != n + 1:  # +1 por el 0 inicial/final
-                raise ValueError("El tour inicial no coincide con el número de ciudades")
-            state_space_size = math.factorial(n - 1)
+        state_space_size = math.factorial(n - 1)
         
         return int(base * math.log(state_space_size))
+    
     def solve(self, problem: TSP, max_restarts=10):
         """Resuelve un problema de optimizacion con ascension de colinas.
 
@@ -189,13 +183,36 @@ class HillClimbingReset(LocalSearch):
 
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
-    def solve(self, problem: TSP, max_stops = 10):
+    def estimate_parameters(self, problem: TSP) -> tuple[int, int]:
+        """Estima valores óptimos para tabu_len y max_stops basado en el problema.
+        
+        Argumentos:
+        ==========
+        problem: TSP
+            Instancia del problema del viajante
+        
+        Retorno:
+        =======
+        tuple[int, int]:
+            (tabu_len, max_stops) recomendados
+        """
+        n = problem.G.number_of_nodes()
+        
+        tabu_len = max(7, min(20, int(math.sqrt(n)) + 3))
+        
+        max_stops = max(50, min(200, n * 5))
+        
+        return tabu_len, max_stops
+    
+    def solve(self, problem: TSP):
+        tabu_len,max_stops = self.estimate_parameters(problem)
         stops = 0
         actual_state = problem.init
         best_state = actual_state
+        print(tabu_len)
+        print(max_stops)
         best_value = problem.obj_val(actual_state)
         tabu = []
-        tabu_len = 7
         start = time()
 
 
