@@ -18,6 +18,7 @@ No viene implementado, se debe completar.
 from __future__ import annotations
 from time import time
 from problem import OptProblem, TSP
+import math
 
 
 
@@ -90,7 +91,45 @@ class HillClimbingReset(LocalSearch):
     En cada iteracion se mueve al estado sucesor con mejor valor objetivo.
     El criterio de parada es alcanzar un optimo local.
     """
+    def estimate_max_restarts(self, problem: TSP, base: float = 0.30) -> int:
+        """Determina un número adecuado de reinicios basado en el tamaño del problema TSP.
 
+        Argumentos:
+        ==========
+        problem: TSP
+            Instancia del problema del viajante. Debe contener:
+            - Un atributo G con el grafo del problema
+            - Método number_of_nodes() en G para obtener el número de ciudades
+            - Opcionalmente un atributo init con el tour inicial
+        base: float
+            Factor de escala para ajustar el número de reinicios (default=0.30)
+
+        Retorno:
+        =======
+        int: 
+            Número estimado de reinicios aleatorios recomendados
+
+        Excepciones:
+        ===========
+        ValueError:
+            - Si el problema no tiene la estructura esperada de TSP
+            - Si el tour inicial no coincide con el número de ciudades
+        """
+        if not hasattr(problem, 'G') or not hasattr(problem.G, 'number_of_nodes'):
+            raise ValueError("El problema no tiene la estructura de TSP esperada")
+        
+        n = problem.G.number_of_nodes()
+        
+        if not hasattr(problem, 'init'):
+            # Si no tiene init, usamos el número de nodos directamente
+            state_space_size = math.factorial(n - 1)
+        else:
+            # Si tiene init, verificamos su longitud
+            if len(problem.init) != n + 1:  # +1 por el 0 inicial/final
+                raise ValueError("El tour inicial no coincide con el número de ciudades")
+            state_space_size = math.factorial(n - 1)
+        
+        return int(base * math.log(state_space_size))
     def solve(self, problem: TSP, max_restarts=10):
         """Resuelve un problema de optimizacion con ascension de colinas.
 
@@ -100,6 +139,7 @@ class HillClimbingReset(LocalSearch):
             un problema de optimizacion
         """
         # Inicializamos reinicios y la cantidad que queremos
+        max_restarts = self.estimate_max_restarts(problem)
         restarts = 0
         best_value = -float("inf") 
         best_solution = None
@@ -144,7 +184,7 @@ class HillClimbingReset(LocalSearch):
         self.value = best_value
         self.tour = best_solution
         self.time = end-start
-    # COMPLETAR
+
 
 
 class Tabu(LocalSearch):
@@ -179,7 +219,7 @@ class Tabu(LocalSearch):
 
             # Agregamos acción a la lista tabú
             tabu.append(act)
-            print(tabu)
+            
             if len(tabu) > tabu_len:
                 tabu.pop(0)
                 
@@ -191,4 +231,4 @@ class Tabu(LocalSearch):
         self.time = end - start
               
 
-    # COMPLETAR
+
