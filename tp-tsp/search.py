@@ -209,8 +209,6 @@ class Tabu(LocalSearch):
         stops = 0
         actual_state = problem.init
         best_state = actual_state
-        print(tabu_len)
-        print(max_stops)
         best_value = problem.obj_val(actual_state)
         tabu = []
         start = time()
